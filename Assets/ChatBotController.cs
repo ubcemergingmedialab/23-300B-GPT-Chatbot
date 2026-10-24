@@ -32,6 +32,15 @@ public class ChatBotController : MonoBehaviour
     void Start()
     {
         AIListen.Active = false;
+
+        // The wrapper keeps its last reply private, so listen for it instead.
+        AIThink.chatGPTResponse.AddListener(OnChatGPTResponse);
+    }
+
+    private void OnChatGPTResponse(string response)
+    {
+        lastChatBotSpeech = response;
+        StartCoroutine(ChatBotSpeak(lastChatBotSpeech));
     }
 
     private IEnumerator ChatBotSpeak(string speech)
@@ -59,13 +68,6 @@ public class ChatBotController : MonoBehaviour
             AIListen.ResultsField.text = "";
             AIListen.Active = false;
             AIThink.SendToChatGPT(promptString);
-        }
-
-        // Does ChatBot have something new to say?
-        if (AIThink._lastChatGPTMsg != lastChatBotSpeech)
-        {
-            lastChatBotSpeech = AIThink._lastChatGPTMsg;
-            StartCoroutine(ChatBotSpeak(lastChatBotSpeech));
         }
     }
 }
